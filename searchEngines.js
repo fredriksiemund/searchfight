@@ -1,4 +1,4 @@
-const { httpsGet } = require("./utils");
+const { httpsGet } = require("./network");
 
 const GOOGLE_ID = "c6b510727951cad28";
 const GOOGLE_KEY = "AIzaSyCGFeWdLAWZUHCGEvFISWVDpDGxrFRcTKg";
@@ -14,6 +14,7 @@ const getGoogleResultCount = async (query) => {
   };
   const response = await httpsGet(request);
   return parseInt(response.searchInformation.totalResults);
+  // return Math.floor(Math.random() * 101);
 };
 
 const getBingResultCount = async (query) => {
@@ -24,15 +25,16 @@ const getBingResultCount = async (query) => {
   };
   const response = await httpsGet(request);
   return response.webPages.totalEstimatedMatches;
+  // return Math.floor(Math.random() * 101);
 };
 
 exports.providers = [
   {
-    name: "google",
+    name: "Google",
     getResultCount: getGoogleResultCount,
   },
   {
-    name: "bing",
+    name: "Bing",
     getResultCount: getBingResultCount,
   },
 ];

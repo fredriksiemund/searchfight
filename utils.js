@@ -1,6 +1,4 @@
-const https = require("https");
-
-exports.validateInput = (args) => {
+exports.validateAndFilterInput = (args) => {
   if (args.length < 3) {
     throw new Error("Provide at least one argument");
   }
@@ -8,62 +6,53 @@ exports.validateInput = (args) => {
   return args.slice(2);
 };
 
-exports.httpsGet = (url) =>
-  new Promise((resolve, reject) => {
-    https
-      .get(url, (res) => {
-        let body = "";
+exports.processResponse = (response) => {
+  const results = {};
 
-        res.on("data", (chunk) => {
-          body += chunk;
-        });
-
-        res.on("end", () => {
-          resolve(JSON.parse(body));
-        });
-      })
-      .on("error", (err) => {
-        reject(err);
-      });
-  });
-
-exports.printResults = (results) => {
-  const seStrings = {};
-  const seWinners = {};
-  const queryResults = {};
-  let queryWinner = null;
-
-  results.forEach(({ query, searchEngine, nbrOfResults }) => {
-    // Create result string for each search engine
-    if (seStrings[searchEngine]) {
-      seStrings[searchEngine] += ` ${query}: ${nbrOfResults}`;
+  response.forEach(({ query, searchEngine, nbrOfResults }) => {
+    if (!results[searchEngine]) {
+      results[searchEngine] = {
+        data: { [query]: nbrOfResults },
+        winner: query,
+      };
     } else {
-      seStrings[searchEngine] = `${searchEngine}: ${query}: ${nbrOfResults}`;
+      let { data, winner } = results[searchEngine];
+      data[query] = data[query] ? data[query] + nbrOfResults : nbrOfResults;
+      results[searchEngine].winner =
+        data[query] > data[winner] ? query : winner;
     }
 
-    // Find query with most search results for each search engine
-    if (seWinners[searchEngine]) {
-      if (nbrOfResults > seWinners[searchEngine].nbrOfResults) {
-        seWinners[searchEngine].query = query;
-        seWinners[searchEngine].nbrOfResults = nbrOfResults;
-      }
+    if (!results.total) {
+      results.total = {
+        data: { [query]: nbrOfResults },
+        winner: query,
+      };
     } else {
-      seWinners[searchEngine] = { query, nbrOfResults };
-    }
-
-    // Find query with most search results in all search engines
-    if (queryResults[query]) {
-      queryResults[query] += nbrOfResults;
-    } else {
-      queryResults[query] = nbrOfResults;
-    }
-    if (!queryWinner || queryResults[query] > queryResults[queryWinner]) {
-      queryWinner = query;
+      let { data, winner } = results.total;
+      data[query] = data[query] ? data[query] + nbrOfResults : nbrOfResults;
+      results.total.winner = data[query] > data[winner] ? query : winner;
     }
   });
 
-  console.log(seStrings);
-  console.log(seWinners);
-  console.log(queryResults);
-  console.log(queryWinner);
+  return results;
+};
+
+exports.formatResult = (result) => {
+  let searchEngineData = "";
+  let searchEngineWinner = "";
+  let totalWinner = "";
+
+  Object.keys(result).forEach((key) => {
+    if (key === "total") {
+      totalWinner = `Total winner: ${result[key].winner}`;
+    } else {
+      const string = Object.keys(result[key].data)
+        .map((query) => `${query}: ${result[key].data[query]}`)
+        .join(" ");
+      searchEngineData += `${key}: ${string}\n`;
+      searchEngineWinner += `${key} winner: ${result[key].winner}\n`;
+    }
+  });
+
+  return searchEngineData + searchEngineWinner + totalWinner;
 };

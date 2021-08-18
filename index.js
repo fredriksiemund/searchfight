@@ -1,4 +1,8 @@
-const { validateInput, printResults } = require("./utils");
+const {
+  validateAndFilterInput,
+  processResponse,
+  formatResult,
+} = require("./utils");
 const { providers } = require("./searchEngines");
 
 const resultObject = async (query, searchEngine, getResultCount) => ({
@@ -9,19 +13,22 @@ const resultObject = async (query, searchEngine, getResultCount) => ({
 
 const run = async () => {
   try {
-    const queries = validateInput(process.argv);
-    const pendingResults = [];
+    const queries = validateAndFilterInput(process.argv);
+    const pendingResponse = [];
 
     queries.forEach((query) => {
       providers.forEach(async ({ name, getResultCount }) => {
-        pendingResults.push(resultObject(query, name, getResultCount));
+        pendingResponse.push(resultObject(query, name, getResultCount));
       });
     });
 
-    const results = await Promise.all(pendingResults);
-    printResults(results);
+    const response = await Promise.all(pendingResponse);
+    const result = processResponse(response);
+    const output = formatResult(result);
+
+    console.log(output);
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 };
 

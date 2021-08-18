@@ -1,6 +1,6 @@
 const https = require("https");
 
-exports.httpsGet = (url) =>
+const httpsGet = (url) =>
   new Promise((resolve, reject) => {
     https
       .get(url, (res) => {
@@ -11,10 +11,16 @@ exports.httpsGet = (url) =>
         });
 
         res.on("end", () => {
-          resolve(JSON.parse(body));
+          if (res.statusCode >= 300) {
+            reject(new Error("Server responded with:\n" + body));
+          } else {
+            resolve(JSON.parse(body));
+          }
         });
       })
       .on("error", (err) => {
         reject(err);
       });
   });
+
+module.exports = { httpsGet };

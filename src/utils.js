@@ -1,12 +1,11 @@
-exports.validateAndFilterInput = (args) => {
+const validateAndFilterInput = (args) => {
   if (args.length < 3) {
     throw new Error("Provide at least one argument");
   }
-
   return args.slice(2);
 };
 
-exports.processResponse = (response) => {
+const processResponse = (response) => {
   const results = {};
 
   response.forEach(({ query, searchEngine, nbrOfResults }) => {
@@ -37,7 +36,7 @@ exports.processResponse = (response) => {
   return results;
 };
 
-exports.formatResult = (result) => {
+const formatResult = (result) => {
   let searchEngineData = "";
   let searchEngineWinner = "";
   let totalWinner = "";
@@ -56,3 +55,5 @@ exports.formatResult = (result) => {
 
   return searchEngineData + searchEngineWinner + totalWinner;
 };
+
+module.exports = { validateAndFilterInput, processResponse, formatResult };

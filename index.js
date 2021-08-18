@@ -1,35 +1,25 @@
+const { fetchResultCounts } = require("./src/searchEngines");
 const {
   validateAndFilterInput,
   processResponse,
   formatResult,
-} = require("./utils");
-const { providers } = require("./searchEngines");
+} = require("./src/utils");
 
-const resultObject = async (query, searchEngine, getResultCount) => ({
-  query,
-  searchEngine,
-  nbrOfResults: await getResultCount(query),
-});
-
-const run = async () => {
-  try {
-    const queries = validateAndFilterInput(process.argv);
-    const pendingResponse = [];
-
-    queries.forEach((query) => {
-      providers.forEach(async ({ name, getResultCount }) => {
-        pendingResponse.push(resultObject(query, name, getResultCount));
-      });
-    });
-
-    const response = await Promise.all(pendingResponse);
-    const result = processResponse(response);
-    const output = formatResult(result);
-
-    console.log(output);
-  } catch (err) {
-    console.log(err);
-  }
+const run = async (args) => {
+  const queries = validateAndFilterInput(args);
+  const response = await fetchResultCounts(queries);
+  const result = processResponse(response);
+  return formatResult(result);
 };
 
-run();
+run(process.argv)
+  .then((output) => {
+    console.log(output);
+  })
+  .catch((error) => {
+    if (!process.argv[1].includes("jest")) {
+      console.log(error);
+    }
+  });
+
+module.exports = { run };

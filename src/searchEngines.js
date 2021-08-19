@@ -1,9 +1,7 @@
 const { httpsGet } = require("./https");
 
 const GOOGLE_ID = "c6b510727951cad28";
-const GOOGLE_KEY = "AIzaSyCGFeWdLAWZUHCGEvFISWVDpDGxrFRcTKg";
-
-const BING_KEY = "a8c2252a3f754da39a49e34a22dd524c";
+const { BING_KEY, GOOGLE_KEY } = process.env;
 
 const providers = [
   {

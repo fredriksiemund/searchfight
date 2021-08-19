@@ -1,3 +1,6 @@
+// Must be placed at the top
+require("./dotenv");
+
 const { fetchResultCounts } = require("./src/searchEngines");
 const {
   validateAndFilterInput,

@@ -87,11 +87,12 @@ const formatResult = (result) => {
     if (key === "total") {
       totalWinner = `Total winner: ${result[key].winner}`;
     } else {
+      const capitalizedKey = key[0].toUpperCase() + key.slice(1);
       const string = Object.keys(result[key].data)
         .map((query) => `${query}: ${result[key].data[query]}`)
         .join(" ");
-      searchEngineData += `${key}: ${string}\n`;
-      searchEngineWinner += `${key} winner: ${result[key].winner}\n`;
+      searchEngineData += `${capitalizedKey}: ${string}\n`;
+      searchEngineWinner += `${capitalizedKey} winner: ${result[key].winner}\n`;
     }
   });
 

@@ -76,12 +76,12 @@ describe("main.js", () => {
     },
   };
   const output =
-    "google: .net: 100 java: 60 go: 8\n" +
-    "yahoo: .net: 200 java: 50 go: 987\n" +
-    "bing: .net: 30 java: 40 go: 7\n" +
-    "google winner: .net\n" +
-    "yahoo winner: go\n" +
-    "bing winner: java\n" +
+    "Google: .net: 100 java: 60 go: 8\n" +
+    "Yahoo: .net: 200 java: 50 go: 987\n" +
+    "Bing: .net: 30 java: 40 go: 7\n" +
+    "Google winner: .net\n" +
+    "Yahoo winner: go\n" +
+    "Bing winner: java\n" +
     "Total winner: go";
 
   describe("testing processResponse", () => {
@@ -104,10 +104,10 @@ describe("main.js", () => {
       });
 
       const expectedResult =
-        "google: .net: 44000000 java: 44000000\n" +
-        "bing: .net: 37000000 java: 37000000\n" +
-        "google winner: .net\n" +
-        "bing winner: .net\n" +
+        "Google: .net: 44000000 java: 44000000\n" +
+        "Bing: .net: 37000000 java: 37000000\n" +
+        "Google winner: .net\n" +
+        "Bing winner: .net\n" +
         "Total winner: .net";
 
       const result = await run(["node", "path", ".net", "java"]);

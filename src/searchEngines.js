@@ -1,6 +1,5 @@
 const { httpsGet } = require("./https");
 
-const GOOGLE_ID = "c6b510727951cad28";
 const { BING_KEY, GOOGLE_KEY } = process.env;
 
 const providers = [
@@ -8,6 +7,7 @@ const providers = [
     name: "google",
     fetchResultCount: async (query) => {
       const encodedQuery = encodeURIComponent(query);
+      const GOOGLE_ID = "c6b510727951cad28";
       const request = {
         hostname: "www.googleapis.com",
         path: `/customsearch/v1?key=${GOOGLE_KEY}&cx=${GOOGLE_ID}&q=${encodedQuery}`,
@@ -31,22 +31,4 @@ const providers = [
   },
 ];
 
-const resultObject = async (query, searchEngine, fetchResultCount) => ({
-  query,
-  searchEngine,
-  nbrOfResults: await fetchResultCount(query),
-});
-
-const fetchResultCounts = (queries) => {
-  const pendingResponse = [];
-
-  queries.forEach((query) => {
-    providers.forEach(({ name, fetchResultCount }) => {
-      pendingResponse.push(resultObject(query, name, fetchResultCount));
-    });
-  });
-
-  return Promise.all(pendingResponse);
-};
-
-module.exports = { providers, fetchResultCounts };
+module.exports = { providers };

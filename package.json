@@ -11,5 +11,10 @@
   "license": "ISC",
   "devDependencies": {
     "jest": "^27.0.6"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/config/jest.js"
+    ]
   }
 }

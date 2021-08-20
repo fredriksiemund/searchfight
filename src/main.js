@@ -1,8 +1,28 @@
+const { providers } = require("./searchEngines");
+
 const validateAndFilterInput = (args) => {
   if (args.length < 3) {
     throw new Error("Provide at least one argument");
   }
   return args.slice(2);
+};
+
+const resultObject = async (query, searchEngine, fetchResultCount) => ({
+  query,
+  searchEngine,
+  nbrOfResults: await fetchResultCount(query),
+});
+
+const fetchResultCounts = (queries) => {
+  const pendingResponse = [];
+
+  queries.forEach((query) => {
+    providers.forEach(({ name, fetchResultCount }) => {
+      pendingResponse.push(resultObject(query, name, fetchResultCount));
+    });
+  });
+
+  return Promise.all(pendingResponse);
 };
 
 const processResponse = (response) => {
@@ -56,4 +76,17 @@ const formatResult = (result) => {
   return searchEngineData + searchEngineWinner + totalWinner;
 };
 
-module.exports = { validateAndFilterInput, processResponse, formatResult };
+const run = async (args) => {
+  const queries = validateAndFilterInput(args);
+  const response = await fetchResultCounts(queries);
+  const result = processResponse(response);
+  return formatResult(result);
+};
+
+module.exports = {
+  fetchResultCounts,
+  formatResult,
+  processResponse,
+  run,
+  validateAndFilterInput,
+};

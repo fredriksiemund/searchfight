@@ -1,4 +1,4 @@
-const { providers, fetchResultCounts } = require("../../src/searchEngines");
+const { providers } = require("../../src/searchEngines");
 const { httpsGet } = require("../../src/https");
 
 jest.mock("../../src/https.js", () => ({
@@ -31,28 +31,6 @@ describe("searchEngines.js", () => {
           expect(error).toEqual(expectedResponse);
         }
       });
-    });
-  });
-
-  describe("testing fetchResultCounts", () => {
-    it("returns output with the correct format", async () => {
-      httpsGet.mockReturnValue({
-        searchInformation: { totalResults: "44000000" },
-        webPages: { totalEstimatedMatches: 37000000 },
-      });
-
-      const queries = [".net", "java", "go"];
-      const expectedResult = [
-        { query: ".net", searchEngine: "google", nbrOfResults: 44000000 },
-        { query: "java", searchEngine: "google", nbrOfResults: 44000000 },
-        { query: "go", searchEngine: "google", nbrOfResults: 44000000 },
-        { query: ".net", searchEngine: "bing", nbrOfResults: 37000000 },
-        { query: "java", searchEngine: "bing", nbrOfResults: 37000000 },
-        { query: "go", searchEngine: "bing", nbrOfResults: 37000000 },
-      ];
-
-      const result = await fetchResultCounts(queries);
-      expect(result).toEqual(expect.arrayContaining(expectedResult));
     });
   });
 });

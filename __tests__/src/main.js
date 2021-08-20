@@ -2,9 +2,16 @@ const {
   validateAndFilterInput,
   processResponse,
   formatResult,
-} = require("../../src/utils");
+  run,
+  fetchResultCounts,
+} = require("../../src/main");
+const { httpsGet } = require("../../src/https");
 
-describe("utils.js", () => {
+jest.mock("../../src/https.js", () => ({
+  httpsGet: jest.fn(),
+}));
+
+describe("main.js", () => {
   describe("testing vaildateAndFilterInput", () => {
     it("returns correct number of args", () => {
       const input = ["1", "2", "3"];
@@ -15,6 +22,27 @@ describe("utils.js", () => {
       const input = ["1", "2"];
       const expectedResponse = new Error("Provide at least one argument");
       expect(() => validateAndFilterInput(input)).toThrow(expectedResponse);
+    });
+  });
+  describe("testing fetchResultCounts", () => {
+    it("returns output with the correct format", async () => {
+      httpsGet.mockReturnValue({
+        searchInformation: { totalResults: "44000000" },
+        webPages: { totalEstimatedMatches: 37000000 },
+      });
+
+      const queries = [".net", "java", "go"];
+      const expectedResult = [
+        { query: ".net", searchEngine: "google", nbrOfResults: 44000000 },
+        { query: "java", searchEngine: "google", nbrOfResults: 44000000 },
+        { query: "go", searchEngine: "google", nbrOfResults: 44000000 },
+        { query: ".net", searchEngine: "bing", nbrOfResults: 37000000 },
+        { query: "java", searchEngine: "bing", nbrOfResults: 37000000 },
+        { query: "go", searchEngine: "bing", nbrOfResults: 37000000 },
+      ];
+
+      const result = await fetchResultCounts(queries);
+      expect(result).toEqual(expect.arrayContaining(expectedResult));
     });
   });
 
@@ -66,6 +94,24 @@ describe("utils.js", () => {
     it("generates the correct output", () => {
       const result = formatResult(processedData);
       expect(result).toEqual(output);
+    });
+  });
+  describe("testing run", () => {
+    it("prints the correct result", async () => {
+      httpsGet.mockReturnValue({
+        searchInformation: { totalResults: "44000000" },
+        webPages: { totalEstimatedMatches: 37000000 },
+      });
+
+      const expectedResult =
+        "google: .net: 44000000 java: 44000000\n" +
+        "bing: .net: 37000000 java: 37000000\n" +
+        "google winner: .net\n" +
+        "bing winner: .net\n" +
+        "Total winner: .net";
+
+      const result = await run(["node", "path", ".net", "java"]);
+      expect(result).toEqual(expectedResult);
     });
   });
 });

@@ -1,9 +1,17 @@
 const https = require("https");
 
-const httpsGet = (url) =>
+/**
+ * A wrapper for the built in htts.get() making it possible to use async/await
+ * @param   {string} hostname - The base url
+ * @param   {string} path - The url path
+ * @param   {Object} [headers] - Optional header object
+ * @throws  Throws an error if status code >= 300
+ * @returns {Promise<Object>} Returns the http body as an Object
+ */
+const httpsGet = (hostname, path, headers = {}) =>
   new Promise((resolve, reject) => {
     https
-      .get(url, (res) => {
+      .get({ hostname, path, headers }, (res) => {
         let body = "";
 
         res.on("data", (chunk) => {

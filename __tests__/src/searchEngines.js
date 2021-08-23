@@ -5,12 +5,13 @@ jest.mock("../../src/https.js", () => ({
   httpsGet: jest.fn(),
 }));
 
-describe("searchEngines.js", () => {
-  const genereateHttpsResponse = {
-    google: (val) => ({ searchInformation: { totalResults: `${val}` } }),
-    bing: (val) => ({ webPages: { totalEstimatedMatches: val } }),
-  };
+// Helper functions to genereate the correct response from httpsGet
+const genereateHttpsResponse = {
+  google: (val) => ({ searchInformation: { totalResults: `${val}` } }),
+  bing: (val) => ({ webPages: { totalEstimatedMatches: val } }),
+};
 
+describe("searchEngines.js", () => {
   providers.forEach(({ name, fetchResultCount }) => {
     describe(`testing fetchResultCount using ${name}`, () => {
       it("returns correct number of results", async () => {

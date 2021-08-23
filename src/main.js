@@ -38,7 +38,7 @@ const fetchResultCounts = (queries) => {
 
 /**
  * Finds the query with most search results for every search engine and for all search engines.
- * @param   {{query: string, searchEngine: string, nbrOfResults: number}[]} response Array of search results
+ * @param   {{query: string, searchEngine: string, nbrOfResults: number}[]} response - Array of search results
  * @returns {Object.<string, { data: Object<string, number>, winner: string }>} Object with the keys "total" and one
  * for every search engine
  */
